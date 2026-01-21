@@ -11,13 +11,13 @@ SUMO_BINARY = "sumo" # or "sumo-gui"
 CONFIG_PATH = "simulation/sumo_config.sumocfg"
 
 # Training parameters
-EPISODES = 50
+EPISODES = 100
 MAX_STEPS = 1000
 ALPHA = 0.1
 GAMMA = 0.9
-EPSILON = 0.2
+EPSILON = 0.4 # Higher initial exploration
 MIN_EPSILON = 0.01
-DECAY = 0.995
+DECAY = 0.99 
 
 def run():
     env = TrafficEnv(SUMO_BINARY, CONFIG_PATH, MAX_STEPS)

@@ -79,20 +79,28 @@ class TrafficEnv(gym.Env):
         state = []
         for lane in self.lanes:
             q_len = traci.lane.getLastStepHaltingNumber(lane)
-            # Discretize
-            if q_len < 3: state.append(0)
-            elif q_len < 8: state.append(1)
-            else: state.append(2)
+            # More granular discretization for better accuracy
+            # 0, 1-2, 3-5, 6-9, 10-15, >15
+            if q_len == 0: state.append(0)
+            elif q_len < 3: state.append(1)
+            elif q_len < 6: state.append(2)
+            elif q_len < 10: state.append(3)
+            elif q_len < 16: state.append(4)
+            else: state.append(5)
             
         phase = traci.trafficlight.getPhase("c")
         state.append(phase)
         return tuple(state)
 
     def _get_reward(self):
-        total_waiting = 0
+        # Reward: Negative cumulative waiting time
+        # We can approximate this by summing the waiting time of all cars
+        total_waiting_time = 0
         for lane in self.lanes:
-            total_waiting += traci.lane.getLastStepHaltingNumber(lane)
-        return -total_waiting
+            # waiting time: sum of all vehicles' waiting time in this lane
+            total_waiting_time += traci.lane.getWaitingTime(lane) 
+            
+        return -total_waiting_time
 
     def close(self):
         traci.close()
