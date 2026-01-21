@@ -5,8 +5,9 @@ import pickle
 from environment import TrafficEnv
 from agent import QLearningAgent
 
+import argparse
+
 # SUMO configuration
-SUMO_BINARY = "sumo-gui" # Use GUI for evaluation to see it
 CONFIG_PATH = "simulation/sumo_config.sumocfg"
 MAX_STEPS = 1000
 
@@ -14,18 +15,19 @@ def load_q_table(path):
     with open(path, 'rb') as f:
         return pickle.load(f)
 
-def run_evaluation():
+def run_evaluation(gui=False):
     if not os.path.exists("models/q_table.pkl"):
         print("No model found. Run training first.")
         return
-
-    env = TrafficEnv(SUMO_BINARY, CONFIG_PATH, MAX_STEPS)
+    
+    sumo_binary = "sumo-gui" if gui else "sumo"
+    env = TrafficEnv(sumo_binary, CONFIG_PATH, MAX_STEPS)
     
     # Initialize agent with loaded Q-table
     agent = QLearningAgent(action_space_size=env.action_space.n, state_space_size=None, epsilon=0.0)
     agent.q_table = load_q_table("models/q_table.pkl")
     
-    print("Starting evaluation...")
+    print(f"Starting evaluation (Mode: {sumo_binary})...")
     state = env.reset()
     total_reward = 0
     done = False
@@ -42,4 +44,8 @@ def run_evaluation():
     env.close()
 
 if __name__ == "__main__":
-    run_evaluation()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--gui", action="store_true", help="Run with SUMO GUI")
+    args = parser.parse_args()
+    
+    run_evaluation(args.gui)

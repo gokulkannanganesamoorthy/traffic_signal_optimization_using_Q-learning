@@ -3,3 +3,4 @@ sumolib
 numpy
 pandas
 matplotlib
+gym
