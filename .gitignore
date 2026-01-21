@@ -1,0 +1,9 @@
+env/
+__pycache__/
+*.pyc
+*.DS_Store
+*.pkl
+tripinfo.xml
+simulation/network.net.xml
+*.sumocfg
+!simulation/sumo_config.sumocfg
